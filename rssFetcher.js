@@ -5,19 +5,19 @@ const feeds = require("./feeds");
 const detectCategory = require("./keywordFilter");
 const db = require("./db");
 
-// ================= INSERT FUNCTION (better-sqlite3 FIXED) =================
+// ================= INSERT FUNCTION (sqlite3 CALLBACK STYLE) =================
 function insertNews(row) {
-  try {
-    const stmt = db.prepare(`
-      INSERT OR IGNORE INTO news
-      (title, summary, category, source, link, published_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(row);
-  } catch (err) {
-    console.log("❌ DB Insert Error:", err.message);
-  }
+  db.run(
+    `INSERT OR IGNORE INTO news
+    (title, summary, category, source, link, published_at)
+    VALUES (?, ?, ?, ?, ?, ?)`,
+    row,
+    function (err) {
+      if (err) {
+        console.log("❌ DB Insert Error:", err.message);
+      }
+    }
+  );
 }
 
 // ================= FETCH RSS NEWS =================
