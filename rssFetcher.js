@@ -5,26 +5,22 @@ const feeds = require("./feeds");
 const detectCategory = require("./keywordFilter");
 const db = require("./db");
 
-// Promise-based DB insert (IMPORTANT FIX)
+// ================= INSERT FUNCTION (better-sqlite3 FIXED) =================
 function insertNews(row) {
-  return new Promise((resolve, reject) => {
-    db.run(
-      `INSERT OR IGNORE INTO news
+  try {
+    const stmt = db.prepare(`
+      INSERT OR IGNORE INTO news
       (title, summary, category, source, link, published_at)
-      VALUES (?, ?, ?, ?, ?, ?)`,
-      row,
-      function (err) {
-        if (err) {
-          console.log("❌ DB Insert Error:", err.message);
-          reject(err);
-        } else {
-          resolve();
-        }
-      }
-    );
-  });
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+
+    stmt.run(row);
+  } catch (err) {
+    console.log("❌ DB Insert Error:", err.message);
+  }
 }
 
+// ================= FETCH RSS NEWS =================
 async function fetchNews() {
   console.log("🚀 Starting RSS Fetch Process...");
 
@@ -44,7 +40,7 @@ async function fetchNews() {
 
         const category = detectCategory(`${title} ${summary}`);
 
-        await insertNews([
+        insertNews([
           title,
           summary,
           category,
