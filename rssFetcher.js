@@ -3,61 +3,38 @@ const parser = new Parser();
 
 const feeds = require("./feeds");
 const detectCategory = require("./keywordFilter");
-const db = require("./db");
 
-// ================= INSERT FUNCTION (sqlite3 CALLBACK STYLE) =================
-function insertNews(row) {
-  db.run(
-    `INSERT OR IGNORE INTO news
-    (title, summary, category, source, link, published_at)
-    VALUES (?, ?, ?, ?, ?, ?)`,
-    row,
-    function (err) {
-      if (err) {
-        console.log("❌ DB Insert Error:", err.message);
-      }
-    }
-  );
-}
+// GLOBAL STORE (IMPORTANT)
+global.newsStore = [];
 
-// ================= FETCH RSS NEWS =================
 async function fetchNews() {
-  console.log("🚀 Starting RSS Fetch Process...");
+  console.log("🚀 RSS STARTED");
+
+  global.newsStore = []; // reset
 
   for (const url of feeds) {
     try {
       const feed = await parser.parseURL(url);
 
-      if (!feed || !feed.items) {
-        console.log("⚠️ Empty feed:", url);
-        continue;
+      for (const item of feed.items || []) {
+        global.newsStore.push({
+          title: item.title,
+          summary: item.contentSnippet,
+          link: item.link,
+          source: feed.title,
+          category: detectCategory(item.title + " " + item.contentSnippet),
+          published_at: item.pubDate
+        });
       }
 
-      for (const item of feed.items) {
-        const title = item.title || "No Title";
-        const summary = item.contentSnippet || item.content || "";
-        const link = item.link || "";
+      console.log("✅ Fetched:", feed.title);
 
-        const category = detectCategory(`${title} ${summary}`);
-
-        insertNews([
-          title,
-          summary,
-          category,
-          feed.title || "Unknown Source",
-          link,
-          item.pubDate || new Date().toISOString()
-        ]);
-      }
-
-      console.log(`✅ Fetched: ${feed.title}`);
-
-    } catch (error) {
-      console.log("❌ RSS Error:", url, error.message);
+    } catch (err) {
+      console.log("❌ RSS Error:", url, err.message);
     }
   }
 
-  console.log("🎯 RSS Fetch Completed Successfully");
+  console.log("🎯 RSS DONE");
 }
 
 module.exports = fetchNews;
