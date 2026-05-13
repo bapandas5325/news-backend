@@ -16,8 +16,12 @@ app.get("/", (req, res) => {
   res.send("Police Monitor Backend Running");
 });
 
+// Run RSS fetch once at startup
 fetchNews();
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+// ✅ FIX: Render-compatible PORT
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
 });
