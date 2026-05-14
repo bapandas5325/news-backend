@@ -1,0 +1,25 @@
+{
+  "name": "police-monitor",
+  "version": "1.0.0",
+  "main": "electron/main.js",
+  "scripts": {
+    "client": "cd client && npm run dev",
+    "server": "cd server && node server.js",
+    "electron": "electron .",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "desktop": "concurrently \"npm run server\" \"npm run client\" \"wait-on http://localhost:5173 && electron .\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "electron": "^42.0.0",
+    "electron-builder": "^26.8.1",
+    "wait-on": "^9.0.5"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "node-cron": "^4.2.1",
+    "rss-parser": "^3.13.0",
+    "sqlite3": "^6.0.1"
+  }
+}
