@@ -255,8 +255,8 @@ function App() {
                 : "#333"
             }}
            onClick={() => {
-  setFilterWB((prev) => !prev);
-  setFilterWorld(false);
+             setFilterWB((prev) => !prev);
+             setFilterWorld(false);
 }}
           >
             🇮🇳 WB Mode
@@ -271,8 +271,8 @@ function App() {
                 : "#333"
             }}
             onClick={() => {
-  setFilterWB((prev) => !prev);
-  setFilterWorld(false);
+             setFilterWB((prev) => !prev);
+             setFilterWorld(false);
 }}
           >
             🌍 World Mode
