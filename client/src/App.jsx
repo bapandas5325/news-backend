@@ -188,8 +188,8 @@ function App() {
           </div>
 
           <div style={styles.sub}>
-            🛡️ Developed & Supervised by SSP
-            (North Zone)
+            🛡️ Developed & Supervised by B.Das
+  
           </div>
         </div>
 
