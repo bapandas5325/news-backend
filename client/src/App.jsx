@@ -72,45 +72,56 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   // ================= FETCH NEWS =================
-  const fetchNews = () => {
-    console.log("🚀 fetchNews CALLED");
+  const fetchNews = async () => {
+  console.log("🚀 fetchNews CALLED");
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    fetch("https://news-backend-7tnv.onrender.com/news")
-      .then((res) => {
-        console.log("STATUS:", res.status);
-        return res.json();
+  try {
+    // 1️⃣ CHECK CACHE FIRST
+    const cached = localStorage.getItem("news");
+    const cachedTime = localStorage.getItem("news_time");
+    const now = Date.now();
+
+    // if cache exists and is fresh (60 seconds)
+    if (cached && cachedTime && now - cachedTime < 60000) {
+      console.log("⚡ Using cached news");
+
+      setNews(JSON.parse(cached));
+      setIsLoading(false);
+      return;
+    }
+
+    // 2️⃣ FETCH FROM API
+    const res = await fetch("https://news-backend-7tnv.onrender.com/news");
+
+    console.log("STATUS:", res.status);
+
+    const data = await res.json();
+
+    console.log("✅ DATA:", data);
+
+    setNews(data);
+
+    // 3️⃣ SAVE CACHE
+    localStorage.setItem("news", JSON.stringify(data));
+    localStorage.setItem("news_time", Date.now());
+
+    setLastUpdated(
+      new Date().toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
       })
-      .then((data) => {
-        console.log("✅ DATA:", data);
+    );
 
-        setNews(data);
-        setIsLoading(false);
-
-        setLastUpdated(
-          new Date().toLocaleString("en-IN", {
-            timeZone: "Asia/Kolkata",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-          })
-        );
-      })
-      .catch((err) => {
-        console.log("❌ ERROR:", err);
-        setIsLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    fetchNews();
-
-    const interval = setInterval(fetchNews, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
+  } catch (err) {
+    console.log("❌ ERROR:", err);
+  } finally {
+    setIsLoading(false);
+  }
+};
   // ================= WB FILTER =================
   const isWB = (text) => {
     const t = text.toLowerCase();
