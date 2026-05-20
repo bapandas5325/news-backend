@@ -709,7 +709,7 @@ function App() {
             </div>
 
             <div style={styles.sub}>
-              🛡️ SUPERVISED BY B.DAS | REAL-TIME INTELLIGENCE
+              🛡️ SUPERVISED BY B.DAS | REAL-TIME INTELLIGENCE SYSTEM
             </div>
           </div>
 
